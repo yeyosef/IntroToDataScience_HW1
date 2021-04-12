@@ -1,0 +1,82 @@
+---
+title: "Home Work 1"
+author: "Yusuf Emre Bayat"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+```{r, include = FALSE}
+### Load packages
+library(readr)
+library(readxl)
+library(tidyverse)
+library(knitr)
+options(dplyr.print_max = 1e9)
+```
+
+```{r, include = FALSE}
+### importing datasets 
+epi_results <- read.csv("data/epi2020results.csv") %>% select(country, EPI.change)
+
+ad_eco <- read_xlsx("data/Advanced_Economies.xlsx")
+
+imf_dm_export <- read_excel("data/imf-dm-export.xls", range = cell_rows(3:227), col_names = c("country", 1980:2025))
+
+```
+
+
+
+```{r, include = FALSE}
+### epi_result and ad_eco datasets merged.
+### try this with  _join functions!!!
+developed_countries <- pull(ad_eco, 1)
+
+epi_added <- epi_results %>% mutate(status = 
+                                      ifelse(pull(epi_results, country) %in% developed_countries, "Developed Economies", "Emerging Economies")) %>% select(country, EPI.change, status)
+
+```
+
+```{r, include = FALSE}
+### all of the three datasets merged- but there are missing values! because of different country names.
+imf_dm_export_2020_table <- imf_dm_export %>% select(1, "2020")
+imf_dm_export_2020_table$`2020` <- as.numeric(as.character(imf_dm_export_2020_table$`2020`))
+dataset <- epi_added %>% left_join(imf_dm_export_2020_table, c = "country") %>% rename("gpd" = "2020")
+```
+
+<!-- kısa yol buldum (left_join)
+```{r}
+imf_dm_export_2020_countries<-imf_dm_export %>% 
+   pull(1)
+imf_dm_export_2020<-imf_dm_export %>% 
+   pull("2020")
+
+dataset <- epi_added  %>% mutate(GPD = ifelse(pull(epi_added, country) %in% imf_dm_export_2020_countries, imf_dm_export_2020, "no data")) %>% select(country, EPI.change, GPD, status)
+
+```
+-->
+
+```{r}
+dataset1 <- dataset
+```
+
+```{r}
+gpd_na_value <- as.character(list(30026.735000000001, 10582.102999999999, 2281.4169999999999, 456.892, 2128.2330000000002, 0, 3854.7429999999999, 746.32899999999995, 1147.807,30644.427, 2567.0059999999999, 1348.6759999999999, 9972.4950000000008, 1911.886, 18669.294999999998, 26910.228999999999, 63051.398000000001, 3497.5120000000002))
+dataset1$gpd[which(is.na(dataset$gpd))] = gpd_na_value
+dataset1$gpd <- as.numeric(as.character(dataset1$gpd))
+```
+
+
+```{r}
+write.table(dataset1, file = "data/dataset.csv", row.names = FALSE, col.names = TRUE, sep = ",")
+```
+
+
+
+
+
+
+
+

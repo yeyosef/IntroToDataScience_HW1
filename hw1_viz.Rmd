@@ -1,0 +1,72 @@
+---
+title: "Home Work 1"
+author: "Yusuf Emre Bayat"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+```{r, include = FALSE, echo = FALSE}
+### Load packages
+library(readr)
+library(knitr)
+library(ggplot2)
+library(plotly)
+library(viridis)
+library(hrbrthemes)
+library(packcircles)
+library(scales)
+library(ggrepel)
+options(dplyr.print_max = 1e9)
+```
+
+```{r, include=FALSE, , echo = FALSE}
+df <- read.csv("data/dataset.csv")
+df <- df %>% arrange(desc(gpd))
+```
+
+```{r, results='asis', echo=FALSE}
+#dataframe table.
+knitr::kable(head(df,10), caption = "First 10 row of DataFrame we are going to use for visualizing:", align = c("l", "c","l","c"))
+```
+
+```{r, echo = F}
+p <- df %>%
+  ggplot(aes(x = EPI.change, y = rnorm(180), size =gpd, color = status)) +
+  
+  geom_point(alpha = 0.8) +
+  
+  theme_minimal() +
+  
+  theme(legend.position = c(0,1.203), legend.justification = c(0,0.99), legend.title = element_blank(), legend.text = element_text(size = 9, colour = "#95918F", family = "Century Gothic", face = "bold"),axis.title=element_text(size=10, face = "bold", family = "Century Gothic"), plot.title=element_text(size=10, vjust=1, hjust = 0.5, face = "bold", family = "Century Gothic"), text = element_text(size=16), plot.background = element_rect(fill = "#E6E6E6", color = "#E6E6E6", size = 2), panel.grid.major.x = element_line(colour = "#dadbbe")) +
+  
+  labs(title="10-year change in the climate change", x = "EPI* score (points)", y ="") +
+  
+  scale_color_manual(values = c("#82BBD9", "#EF7B86")) +
+  
+  scale_y_discrete(labels = "none") +
+  
+  geom_vline(xintercept = 0, colour = "#0E0E0E") +
+  
+  guides(size = FALSE) +
+  
+  guides(color = guide_legend(override.aes = list(size = 6))) +
+  
+  scale_size(range = c(1, 13)) +
+  
+  scale_x_continuous(breaks = seq(-15, 15, 10), limits = c(-20,20), position = "top") 
+p
+```
+
+
+ 
+
+
+
+
+
+
+
