@@ -70,6 +70,7 @@ dataset1$gpd <- as.numeric(as.character(dataset1$gpd))
 
 
 ```{r}
+dataset1 <- dataset1 %>% mutate(random_y = rnorm(180))
 write.table(dataset1, file = "data/dataset.csv", row.names = FALSE, col.names = TRUE, sep = ",")
 ```
 
